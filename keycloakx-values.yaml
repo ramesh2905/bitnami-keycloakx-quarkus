@@ -1,0 +1,91 @@
+image:
+  tag: 23.0.7
+  repository: bitnami/keycloak
+
+postgresql:
+  enabled: false
+
+production: true
+
+proxy: edge
+
+replicaCount: 2
+
+service:
+  ports:
+    http: 8080
+    https: 8443
+
+ingress: 
+  enabled: true
+  ingressClassName: nginx
+  hostname: keycloakx-test.example.com
+
+adminIngress:
+  enabled: true
+  ingressClassName: nginx
+  hostname: keycloakx-test.example.com
+  path: /auth/admin
+
+auth:
+  adminUser: admin
+  adminPassword: admin
+
+extraEnvVars:
+  - name: KEYCLOAK_PRODUCTION
+    value: "true"
+  - name: KEYCLOAK_USER
+    value: "admin"
+  - name: KEYCLOAK_PASSWORD
+    value: "admin"
+  - name: CACHE_OWNERS_COUNT
+    value: "2"
+  - name: CACHE_OWNERS_AUTH_SESSIONS_COUNT
+    value: "2"
+  - name: KC_HEALTH_ENABLED
+    value: "true"
+  - name: KC_METRICS_ENABLED
+    value: "true"
+  - name: KC_LOG_LEVEL
+    value: "INFO"
+  - name: KC_HOSTNAME_STRICT
+    value: "false"
+  - name: QUARKUS_TRANSACTION_MANAGER_ENABLE_RECOVERY
+    value: "true"
+  - name: JAVA_OPTS_APPEND
+    value: "-Xms128m -Xmx512m -XX:MetaspaceSize=96M -XX:MaxMetaspaceSize:256m -Djgroups.dns.query=keycloak-headless.bitnami.svc.cluster.local"
+  
+livenessProbe:
+  initialDelaySeconds: 120
+  timeoutSeconds: 10
+  periodSeconds: 5
+
+readinessProbe:
+  enabled: true 
+  initialDelaySeconds: 45
+  timeoutSeconds: 5
+  periodSeconds: 5
+
+resources:
+  limits: 
+    cpu: 250m
+    memory: 512Mi
+  requests:
+    cpu: 128m
+    memory: 256Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 3
+
+metrics: 
+  enabled: true
+
+externalDatabase:
+  host: "localhost"
+  port: 5432
+  user: admin
+  password: changeme
+  database: postgresql
+
